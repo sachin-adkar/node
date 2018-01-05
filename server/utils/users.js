@@ -35,6 +35,9 @@ class Users {
 
         return namesArray;
     }
+    getRooms (){
+        return this.users.map((user)=>user.room);
+    }
 }
 
 

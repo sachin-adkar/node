@@ -19,13 +19,14 @@ app.use(express.static(publicPath));
 
 io.on('connection', (socket) => {
     console.log('New user connected');
-
+    var rooms = [];
+    rooms = rooms.concat(users.getRooms());
+    io.emit('displayRooms', rooms);
 
     socket.on('join', (params, callback) => {
-        if (!(isRealString(params.name) || isRealString(params.room))) {
-            return callback('Name and Room name required')
+        if(!(isRealString(params.name)&& (isRealString(params.room)))){
+            callback('Enter the all fields');
         }
-
         socket.join(params.room);
         users.removeUser(socket.id);
         users.addUser(socket.id, params.name, params.room);
@@ -49,11 +50,11 @@ io.on('connection', (socket) => {
 
     socket.on('createLocationMessage', (coords) => {
         var user = users.getUser(socket.id);
-        if(user){
+        if (user) {
             io.to(user.room).emit('newLocationMessage', generateLocationMessage(user.name, coords.latitude, coords.longitude));
         }
-        
-        
+
+
     });
 
     socket.on('disconnect', () => {

@@ -1,21 +1,70 @@
+require('./config/config.js');
+
 const path = require('path');
 const express = require('express');
 const http = require('http');
-
+const bodyParser = require('body-parser');
 const socketIO = require('socket.io');
+const _ = require('lodash');
 
+
+var { mongoose } = require('./db/mongoose');
 const publicPath = path.join(__dirname, '../public');
 const app = express();
 const port = process.env.PORT || 3000;
 const { generateMessage, generateLocationMessage } = require('./utils/message');
 const { isRealString } = require('./utils/validation.js')
 const { Users } = require('./utils/users');
+const { User } = require('./models/user');
+const { authenticate } = require('./middleware/authenticate');
+
 
 var server = http.createServer(app);
 var io = socketIO(server);
 var users = new Users();
 
 app.use(express.static(publicPath));
+app.use(bodyParser.json());
+var urlencodedParser = bodyParser.urlencoded({ extended: false })
+
+app.post('/signup', urlencodedParser, async (req, res) => {
+    try {
+        var body = _.pick(req.body, ['name', 'email', 'password']);
+      
+        var user = new User(body);
+        await user.save();
+        res.send('Success');
+    } catch (err) {
+        if (err.name === 'MongoError') {
+            res.send('Email already exists');
+           console.log('Already exist');
+            
+        } else if (err.name === 'ValidationError') {
+            // if(err.path === 'name'){
+            console.log('Validation Error');
+
+            res.send('Fill all fields correctly');
+            // }
+            // else if(err.path{} === 'password'){
+            //     res.send('Password should be atleast 6 characters');
+            // }
+        }
+
+    }
+
+});
+app.get('/login', async (req, res) => {
+    try {
+
+        var user = await User.findUser(req.query.name, req.query.password);
+        if (!user) {
+            res.send('Invalid username and password, try again');
+        }
+        
+    } catch (e) {
+        res.status(401).send('Invalid username and password, try again');
+    }
+})
 
 io.on('connection', (socket) => {
     console.log('New user connected');
@@ -24,7 +73,7 @@ io.on('connection', (socket) => {
     io.emit('displayRooms', rooms);
 
     socket.on('join', (params, callback) => {
-        if(!(isRealString(params.name)&& (isRealString(params.room)))){
+        if (!(isRealString(params.name) && (isRealString(params.room)))) {
             callback('Enter the all fields');
         }
         socket.join(params.room);

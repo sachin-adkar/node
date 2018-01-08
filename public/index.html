@@ -8,36 +8,38 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
 </head>
 
+
 <body class="centered-form">
     <div class="centered-form__form">
-        <form action="/chat.html">
+        <form id="signup-form" action="/login.html">
             <div class="form-field">
                 <h3>Join a chat</h3>
             </div>
             <div class="form-field">
                 <label>Enter name</label>
-                <input type="text" name="name" autofocus/>
+                <input type="text" name="name" autofocus id="name"/>
             </div>
             <div class="form-field">
-              <label>Create chat room</label>  
-              <input type="text" name="room"/>
+                <label>Enter Email</label>
+                <input type="text" name="email" id="email"/>
             </div>
             <div class="form-field">
-                <label>Active chat rooms</label>  
-              <!-- <select name="activeRoom" id="select"> -->
-            <select id="select" name="activeRoom">
-                <option value="">Select</option>
-            </select>                
-              </div>
-            
+                <label>Password</label>
+                <input type="password" name="password" id="password"/>
+            </div>
+
             <div class="form-field">
-            <button>Join</button>
+                <button>Join</button>
+            </div>
+            <div class="form-field">
+                <a href="/login.html"><i>Already a user?</i></a>
             </div>
         </form>
     </div>
     <script src="/socket.io/socket.io.js"></script>
     <script src="/js/libs/jquery-3.1.0.min.js"></script>
-    <script src="/js/index.js"></script>
+    <script src="//fast.wistia.net/labs/fresh-url/v1.js" async></script>
+    <script src="/js/signup.js"></script>
 
 </body>
 

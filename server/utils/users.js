@@ -14,20 +14,25 @@ class Users {
         this.users = [];
     }
     addUser(id, name, room) {
-        var user = { id, name, room };
+        var user = { id, name, room};
         this.users.push(user);
         return user;
+    }
+    updateRoom(id, room){
+        
+        var user = this.getUser(id);
+        user.room = room;
     }
     removeUser(id) {
         var user = this.getUser(id);
 
-        if(user){
-            this.users = this.users.filter((user)=>user.id !== id);  
+        if (user) {
+            this.users = this.users.filter((user) => user.id !== id);
         }
         return user;
     }
     getUser(id) {
-       return this.users.filter((user)=> user.id === id)[0];
+        return this.users.filter((user) => user.id === id)[0];
     }
     getUserList(room) {
         var users = this.users.filter((user) => user.room === room);
@@ -35,32 +40,33 @@ class Users {
 
         return namesArray;
     }
-    getRooms (){
-        return this.users.map((user)=>user.room);
+    getRooms() {
+
+        var tempRoom = this.users.map((user) => user.room);
+        var temp = new Users();
+        return temp.removeDuplicate(tempRoom);
+    }
+    getAllUsers() {
+        console.log(this.users);
+        return this.users.map((user) => user.name);
+    }
+
+
+
+    removeDuplicate(arr) {
+        let unique_array = []
+        for (let i = 0; i < arr.length; i++) {
+            if (unique_array.indexOf(arr[i]) == -1) {
+                unique_array.push(arr[i])
+            }
+        }
+        return unique_array
     }
 }
 
 
-var me = new Users();
-// me.addUser(1, 'sachin', 'TJ');
 
 
-//console.log(me.addUser(1, 'sachin', 'TJ'));
 
-// class Person {
-//     constructor(name, age){
-//     this.name = name;
-//     this.age = age;
-//     }
-// getUserDescription(){
-//     return `${this.name} is ${this.age} year(s) old`;
-// }
-
-// }
-
-// var me = new Person('Sachin', 23);
-// console.log(me.name, me.age);
-// var description = me.getUserDescription();
-// console.log(description);
 
 module.exports = { Users };

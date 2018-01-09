@@ -22,21 +22,28 @@ function scrollToBottom() {
 
 //listening to events
 socket.on('connect', function () {
-   
-    var params = jQuery.deparam(window.location.searh);
 
-       if (!params.room) {
+    var params = jQuery.deparam(window.location.searh);
+   
+   console.log('getting', localStorage.getItem("userName"));
+   
+   
+    params.name = localStorage.getItem('userName');
+    console.log(params.name);
+    
+    // localStorage.removeItem('userName');
+    if (!params.room) {
         params.room = params.activeRoom;
     }
     socket.emit('join', params, function (err) {
         if (err) {
             alert(err);
-            window.location.href = '/';
+            window.location.href = `/next.html?name=${params.name}`;
         } else {
             console.log('No error');
         }
     })
-   
+
 });
 socket.on('disconnect', function () {
     console.log('Disconnected from server');

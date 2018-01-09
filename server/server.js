@@ -30,15 +30,15 @@ var urlencodedParser = bodyParser.urlencoded({ extended: false })
 app.post('/signup', urlencodedParser, async (req, res) => {
     try {
         var body = _.pick(req.body, ['name', 'email', 'password']);
-      
+
         var user = new User(body);
         await user.save();
         res.send('Success');
     } catch (err) {
         if (err.name === 'MongoError') {
             res.send('Email already exists');
-           console.log('Already exist');
-            
+            console.log('Already exist');
+
         } else if (err.name === 'ValidationError') {
             // if(err.path === 'name'){
             console.log('Validation Error');
@@ -60,7 +60,7 @@ app.get('/login', async (req, res) => {
         if (!user) {
             res.send('Invalid username and password, try again');
         }
-        
+        res.send('Loggedi n')
     } catch (e) {
         res.status(401).send('Invalid username and password, try again');
     }
@@ -70,16 +70,26 @@ io.on('connection', (socket) => {
     console.log('New user connected');
     var rooms = [];
     rooms = rooms.concat(users.getRooms());
-    io.emit('displayRooms', rooms);
+    var usersList = users.getAllUsers();
+   
 
+
+
+
+
+
+
+    io.emit('displayRooms', rooms);
+    io.emit('displayUsers', usersList);
+   
     socket.on('join', (params, callback) => {
-        if (!(isRealString(params.name) && (isRealString(params.room)))) {
-            callback('Enter the all fields');
+        if (!params.room) {
+            callback('Join a room or create one');
         }
         socket.join(params.room);
         users.removeUser(socket.id);
         users.addUser(socket.id, params.name, params.room);
-
+        
         io.to(params.room).emit('updateUserList', users.getUserList(params.room));
         socket.emit('newMessage', generateMessage('Admin', 'Welcome to the chat app'));
         socket.broadcast.to(params.room).emit('newMessage', generateMessage('Admin', `${params.name} has joined the chat!`));

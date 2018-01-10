@@ -1,4 +1,30 @@
-var socket = io();
+var setMessage = function (message) {
+
+
+    var formattedTime = moment(message.createdAt).format('h:mm a')
+
+    // console.log('New message', message);
+    // var li = jQuery('<li></li>');
+    // li.text(`${message.from} ${formattedTime}: ${message.text}`);
+
+    // jQuery('#messages').append(li);
+
+    var template = jQuery('#message-template').html();
+    var html = Mustache.render(template, {
+        text: message.text,
+        from: message.from,
+        createdAt: formattedTime
+
+    });
+    jQuery('#messages').append(html);
+};
+
+
+
+
+
+
+
 
 
 
@@ -21,78 +47,81 @@ function scrollToBottom() {
 };
 
 //listening to events
-socket.on('connect', function () {
+// socket.on('connect', function () {
 
-    var params = jQuery.deparam(window.location.searh);
-   
-   console.log('getting', localStorage.getItem("userName"));
-   
-   
-    params.name = localStorage.getItem('userName');
-    console.log(params.name);
-    
-    // localStorage.removeItem('userName');
-    if (!params.room) {
-        params.room = params.activeRoom;
-    }
-    socket.emit('join', params, function (err) {
-        if (err) {
-            alert(err);
-            window.location.href = `/next.html?name=${params.name}`;
-        } else {
-            console.log('No error');
-        }
-    })
+//     var params = jQuery.deparam(window.location.searh);
 
-});
-socket.on('disconnect', function () {
-    console.log('Disconnected from server');
-});
+//    console.log('getting', localStorage.getItem("userName"));
+
+
+//     params.name = localStorage.getItem('userName');
+//     console.log(params.name);
+
+//     // localStorage.removeItem('userName');
+//     if (!params.room) {
+//         params.room = params.activeRoom;
+//     }
+//     socket.emit('join', params, function (err) {
+//         if (err) {
+//             alert(err);
+//             window.location.href = `/next.html?name=${params.name}`;
+//         } else {
+//             console.log('No error');
+//         }
+//     })
+
+// });
+
+
+
+// socket.on('disconnect', function () {
+//     console.log('Disconnected from server');
+// });
 
 
 //custom events
 
-socket.on('updateUserList', function (users) {
-    var ul = jQuery('<ul></ul>');
+// socket.on('updateUserList', function (users) {
+//     var ul = jQuery('<ul></ul>');
 
-    users.forEach(function (user) {
-        ul.append(jQuery('<li></li>').text(user));
-    });
-    jQuery('#users').html(ul);
-});
-
-
+//     users.forEach(function (user) {
+//         ul.append(jQuery('<li></li>').text(user));
+//     });
+//     jQuery('#users').html(ul);
+// });
 
 
-socket.on('newMessage', function (message) {
-    var formattedTime = moment(message.createdAt).format('h:mm a')
 
-    // console.log('New message', message);
-    // var li = jQuery('<li></li>');
-    // li.text(`${message.from} ${formattedTime}: ${message.text}`);
 
-    // jQuery('#messages').append(li);
-    var template = jQuery('#message-template').html();
-    var html = Mustache.render(template, {
-        text: message.text,
-        from: message.from,
-        createdAt: formattedTime
-    });
+// socket.on('newMessage', function (message) {
+//     var formattedTime = moment(message.createdAt).format('h:mm a')
 
-    jQuery('#messages').append(html);
-    scrollToBottom();
-});
+//     // console.log('New message', message);
+//     // var li = jQuery('<li></li>');
+//     // li.text(`${message.from} ${formattedTime}: ${message.text}`);
 
-socket.on('newLocationMessage', function (message) {
-    var formattedTime = moment(message.createdAt).format('h:mm a')
-    var template = jQuery('#location-message-template').html();
-    var html = Mustache.render(template, {
-        from: message.from,
-        url: message.url,
-        createdAt: formattedTime
-    });
-    jQuery('#messages').append(html);
-    scrollToBottom();
+//     // jQuery('#messages').append(li);
+//     var template = jQuery('#message-template').html();
+//     var html = Mustache.render(template, {
+//         text: message.text,
+//         from: message.from,
+//         createdAt: formattedTime
+//     });
+
+//     jQuery('#messages').append(html);
+//     scrollToBottom();
+// });
+
+// socket.on('newLocationMessage', function (message) {
+//     var formattedTime = moment(message.createdAt).format('h:mm a')
+//     var template = jQuery('#location-message-template').html();
+//     var html = Mustache.render(template, {
+//         from: message.from,
+//         url: message.url,
+//         createdAt: formattedTime
+//     });
+//     jQuery('#messages').append(html);
+//     scrollToBottom();
 
     // var li = jQuery('<li></li>');
     // var a = jQuery('<a target="_blank">My current location</a>');
@@ -101,39 +130,39 @@ socket.on('newLocationMessage', function (message) {
     // a.attr('href', message.url);
     // li.append(a);
     // jQuery('#messages').append(li);
-});
+// });
 
-jQuery(`#message-form`).on('submit', function (e) {
-    e.preventDefault();
+// jQuery(`#message-form`).on('submit', function (e) {
+//     e.preventDefault();
 
-    var messageTextbox = jQuery('[name=message]');
+//     var messageTextbox = jQuery('[name=message]');
 
-    socket.emit('createMessage', {
-        text: messageTextbox.val()
-    }, function () {
-        messageTextbox.val('');
-    });
-});
+//     socket.emit('createMessage', {
+//         text: messageTextbox.val()
+//     }, function () {
+//         messageTextbox.val('');
+//     });
+// });
 
-var locationButton = jQuery(`#send-location`);
+// var locationButton = jQuery(`#send-location`);
 
-locationButton.on('click', function () {
-    if (!navigator.geolocation) {
-        return alert('Geolocation not supported by your browser');
-    }
+// locationButton.on('click', function () {
+//     if (!navigator.geolocation) {
+//         return alert('Geolocation not supported by your browser');
+//     }
 
-    locationButton.attr('disabled', 'disabled').text('Sending Location...');
+//     locationButton.attr('disabled', 'disabled').text('Sending Location...');
 
-    navigator.geolocation.getCurrentPosition(function (position) {
-        locationButton.removeAttr('disabled').text('Send Location');
-        socket.emit('createLocationMessage', {
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude
-        });
+//     navigator.geolocation.getCurrentPosition(function (position) {
+//         locationButton.removeAttr('disabled').text('Send Location');
+//         socket.emit('createLocationMessage', {
+//             latitude: position.coords.latitude,
+//             longitude: position.coords.longitude
+//         });
 
-    }, function () {
-        alert('Unable to fetch the location.')
-        locationButton.removeAttr('disabled').text('Send Location');
-    })
+//     }, function () {
+//         alert('Unable to fetch the location.')
+//         locationButton.removeAttr('disabled').text('Send Location');
+//     })
 
-});
+// });

@@ -1,22 +1,50 @@
-var socket = io();
+jQuery('#join-form').on('submit', function (e) {
+    e.preventDefault();
+    var room = jQuery('#room').val();
+    // var activeRoom = jQuery('#select').val();
+    if (!room) {
+        if (!activeRoom) {
+            alert('Please create or join a room');
+            return;
+        }
+        room = activeRoom;
+    }
+    setRoom(room, true);
+});
 
-
-window.onload = function () {
-    var div = jQuery('#greet-user');
-    var uName = jQuery.deparam(window.location.search);
-    div.append(jQuery('<h3></h3>').text('Welcome ' + uName.name + ' !'));
+var removeRoomForm = function(){
+    $('#centered-form__form').hide();
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 // jQuery(`#join-form`).on('submit', function (e) {
 //     var params = jQuery.deparam(window.location.searh);
-   
+
 //    console.log('getting value', localStorage.getItem("userName"));
-   
-   
+
+
 //     // params.name = localStorage.getItem('userName');
 //     // console.log(params.name);
-    
+
 //     // localStorage.removeItem('userName');
 //     if (!params.room) {
 //         params.room = params.activeRoom;
@@ -32,26 +60,25 @@ window.onload = function () {
 //     });
 
 
+//  socket.on('displayRooms', function (rooms) {
 
- socket.on('displayRooms', function (rooms) {
+//      var template = jQuery('#active-room').html();
+//      console.log(rooms);
+//     rooms.forEach(function (room) {
+//          jQuery('#select').append(jQuery('<option></option>').text(room));
+//      });
+//  });
 
-     var template = jQuery('#active-room').html();
-     console.log(rooms);
-    rooms.forEach(function (room) {
-         jQuery('#select').append(jQuery('<option></option>').text(room));
-     });
- });
+// socket.on('displayUsers', function (users) {
+//     var ul = jQuery('<ul></ul>');
 
-socket.on('displayUsers', function (users) {
-    var ul = jQuery('<ul></ul>');
+//     users.forEach(function (user) {
+//         console.log(user);
 
-    users.forEach(function (user) {
-        console.log(user);
-        
-        ul.append(jQuery('<li></li>').text(user));
-    });
-    jQuery('#displayUsers').html(ul);
-    });
+//         ul.append(jQuery('<li></li>').text(user));
+//     });
+//     jQuery('#displayUsers').html(ul);
+//     });
 
 
 

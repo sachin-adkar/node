@@ -23,36 +23,12 @@ var server = http.createServer(app);
 var io = socketIO(server);
 var users = new Users();
 
+
+
 app.use(express.static(publicPath));
 app.use(bodyParser.json());
 var urlencodedParser = bodyParser.urlencoded({ extended: false })
 
-app.post('/signup', urlencodedParser, async (req, res) => {
-    try {
-        var body = _.pick(req.body, ['name', 'email', 'password']);
-
-        var user = new User(body);
-        await user.save();
-        res.send('Success');
-    } catch (err) {
-        if (err.name === 'MongoError') {
-            res.send('Email already exists');
-            console.log('Already exist');
-
-        } else if (err.name === 'ValidationError') {
-            // if(err.path === 'name'){
-            console.log('Validation Error');
-
-            res.send('Fill all fields correctly');
-            // }
-            // else if(err.path{} === 'password'){
-            //     res.send('Password should be atleast 6 characters');
-            // }
-        }
-
-    }
-
-});
 app.get('/login', async (req, res) => {
     try {
 
@@ -69,30 +45,61 @@ app.get('/login', async (req, res) => {
 io.on('connection', (socket) => {
     console.log('New user connected');
     var rooms = [];
+
+    socket.on('signup', (data, callback) => {
+        var userData = new User(data);
+        userData.save().then((userDoc) => {
+            console.log(userDoc);
+            users.addUser(socket.id, userDoc.name);
+            socket.emit("signed-up", userDoc);
+
+            callback();
+
+        }).catch((err) => {
+            console.log(err);
+            callback(err);
+        });
+    });
+
+socket.on('setroom', function(id,room){
+    
+    var user = users.getUser(socket.id);
+    user.room = room; 
+    console.log(user);
+    
+        User.findOneAndUpdate({
+        _id: id,
+      }, { $set:{room: room} }, { new: true }).then((userDoc)=>{
+        //   console.log(userDoc);
+          socket.emit('initiate', userDoc);
+    }).catch((e)=>{
+        console.log(e);
+        
+    });
+});
+
+
+
+
+
+
+
     rooms = rooms.concat(users.getRooms());
     var usersList = users.getAllUsers();
-   
-
-
-
-
-
-
-
     io.emit('displayRooms', rooms);
     io.emit('displayUsers', usersList);
-   
-    socket.on('join', (params, callback) => {
-        if (!params.room) {
-            callback('Join a room or create one');
-        }
-        socket.join(params.room);
-        users.removeUser(socket.id);
-        users.addUser(socket.id, params.name, params.room);
+
+    socket.on('join', (user, callback) => {
+       console.log('listen to join',user);
+       
+        socket.join(user.room);
         
-        io.to(params.room).emit('updateUserList', users.getUserList(params.room));
+        users.removeUser(user.id);
+        users.addUser(user.id, user.name, user.room);
+
+        io.to(user.room).emit('updateUserList', users.getUserList(user.room));
         socket.emit('newMessage', generateMessage('Admin', 'Welcome to the chat app'));
-        socket.broadcast.to(params.room).emit('newMessage', generateMessage('Admin', `${params.name} has joined the chat!`));
+        socket.broadcast.to(user.room).emit('newMessage', generateMessage('Admin', `${user.name} has joined the chat!`));
 
         callback();
     });

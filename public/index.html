@@ -9,37 +9,51 @@
 </head>
 
 
-<body class="centered-form">
-    <div class="centered-form__form">
-        <form id="signup-form" action="/login.html">
+<body>
+    <div class="centered-form" id="centered-form">
+            <div class="centered-form__form" id="centered-form__form">
+                    <div class="create-room">
+                <form id="signup-form">
             <div class="form-field">
                 <h3>Join a chat</h3>
             </div>
             <div class="form-field">
                 <label>Enter name</label>
-                <input type="text" name="name" autofocus id="name"/>
+                <input type="text" name="name" autofocus id="name" />
             </div>
             <div class="form-field">
                 <label>Enter Email</label>
-                <input type="text" name="email" id="email"/>
+                <input type="text" name="email" id="email" />
             </div>
             <div class="form-field">
                 <label>Password</label>
-                <input type="password" name="password" id="password"/>
+                <input type="password" name="password" id="password" />
             </div>
 
             <div class="form-field">
                 <button>Join</button>
             </div>
             <div class="form-field">
-                <a href="/login.html"><i>Already a user?</i></a>
+                <a href="/login.html">
+                    <i>Already a user?</i>
+                </a>
             </div>
         </form>
     </div>
+    </div>
+    </div>
+    <div id="add-next"></div>
     <script src="/socket.io/socket.io.js"></script>
+    <script>
+        socket = io();
+    </script>
     <script src="/js/libs/jquery-3.1.0.min.js"></script>
     <script src="//fast.wistia.net/labs/fresh-url/v1.js" async></script>
+    <!-- <script src="js/libs/mustache.js"></script> -->
+    <script src="js/libs/deparam.js"></script>
     <script src="/js/signup.js"></script>
+    <script src="/js/chat.js"></script>
+    <script src="/js/index.js"></script>
 
 </body>
 

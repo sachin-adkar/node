@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Join | ChatApp</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+</head>
+
+
+<body class="centered-form">
+    <div class="centered-form__form">
+        <form id="login-form">
+            <div class="form-field">
+                <h3>Join a chat</h3>
+            </div>
+            <div class="form-field">
+                <label>Enter name</label>
+                <input type="text" name="name" autofocus id="name"/>
+            </div>
+            <div class="form-field">
+                <label>Password</label>
+                <input type="password" name="password" id="password"/>
+            </div>
+
+            <div class="form-field">
+                <button>LOGIN</button>
+            </div>
+           
+        </form>
+    </div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/libs/jquery-3.1.0.min.js"></script>
+    <script src="/js/login.js"></script>
+
+</body>
+
+</html>

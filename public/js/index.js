@@ -1,20 +1,20 @@
-jQuery('#join-form').on('submit', function (e) {
-    e.preventDefault();
-    var room = jQuery('#room').val();
-    // var activeRoom = jQuery('#select').val();
-    if (!room) {
-        if (!activeRoom) {
-            alert('Please create or join a room');
-            return;
-        }
-        room = activeRoom;
-    }
-    setRoom(room, true);
-});
+// jQuery('#join-form').on('submit', function (e) {
+//     e.preventDefault();
+//     var room = jQuery('#room').val();
+//     // var activeRoom = jQuery('#select').val();
+//     if (!room) {
+//         if (!activeRoom) {
+//             alert('Please create or join a room');
+//             return;
+//         }
+//         room = activeRoom;
+//     }
+//     setRoom(room, true);
+// });
 
-var removeRoomForm = function(){
-    $('#centered-form__form').hide();
-}
+// var removeRoomForm = function(){
+//     $('#centered-form__form').hide();
+// }
 
 
 

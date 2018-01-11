@@ -1,27 +1,75 @@
-var setMessage = function (message) {
+// var setRoom = function (room, flag) {
+//     console.log(room);
+//     console.log(id);
 
 
-    var formattedTime = moment(message.createdAt).format('h:mm a')
+//     socket.emit('setroom', id, room);
 
-    // console.log('New message', message);
-    // var li = jQuery('<li></li>');
-    // li.text(`${message.from} ${formattedTime}: ${message.text}`);
-
-    // jQuery('#messages').append(li);
-
-    var template = jQuery('#message-template').html();
-    var html = Mustache.render(template, {
-        text: message.text,
-        from: message.from,
-        createdAt: formattedTime
-
-    });
-    jQuery('#messages').append(html);
-};
+//     $('#centered-form').load("chat.html", function () {
+//         alert('added chat page');
+//     });
+//     socket.on('initiate', function (user) {
+//         removeRoomForm();
 
 
+      
+//         socket.emit('join', user, function (e) {
+//             if (e) console.log('error');
+
+//         });
+//         socket.on('newMessage', function (message) {
+
+//             setMessage(message);
+
+//      // scrollToBottom();
+//         });
+
+//     });
 
 
+//     // socket.on('setNewRoom', (room)=>{})
+// }
+
+
+
+
+
+
+// var setMessage = function (message) {
+
+
+//     var formattedTime = moment(message.createdAt).format('h:mm a')
+
+//     // console.log('New message', message);
+//     // var li = jQuery('<li></li>');
+//     // li.text(`${message.from} ${formattedTime}: ${message.text}`);
+
+//     // jQuery('#messages').append(li);
+
+//     var template = jQuery('#message-template').html();
+//     var html = Mustache.render(template, {
+//         text: message.text,
+//         from: message.from,
+//         createdAt: formattedTime
+
+//     });
+//     jQuery('#messages').append(html);
+// };
+
+
+
+
+// jQuery(`#message-form`).on('submit', function (e) {
+//     e.preventDefault();
+
+//     var messageTextbox = jQuery('[name=message]');
+
+//     socket.emit('createMessage', {
+//         text: messageTextbox.val()
+//     }, function () {
+//         messageTextbox.val('');
+//     });
+// });
 
 
 
@@ -144,7 +192,14 @@ function scrollToBottom() {
 //     });
 // });
 
-// var locationButton = jQuery(`#send-location`);
+// var locationButton = jQuery(`#send-location`);// socket.on('updateUserList', function (users) {
+//     var ul = jQuery('<ul></ul>');
+
+//     users.forEach(function (user) {
+//         ul.append(jQuery('<li></li>').text(user));
+//     });
+//     jQuery('#users').html(ul);
+// });
 
 // locationButton.on('click', function () {
 //     if (!navigator.geolocation) {

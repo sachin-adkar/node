@@ -13,13 +13,13 @@ class Users {
     constructor() {
         this.users = [];
     }
-    addUser(id, name, room) {
-        var user = { id, name, room};
+    addUser(id, name, room, _socketid) {
+        var user = { id, name, room, _socketid };
         this.users.push(user);
         return user;
     }
-    updateRoom(id, room){
-        
+    updateRoom(id, room) {
+
         var user = this.getUser(id);
         user.room = room;
     }
@@ -47,8 +47,10 @@ class Users {
         return temp.removeDuplicate(tempRoom);
     }
     getAllUsers() {
-        console.log(this.users);
-        return this.users.map((user) => user.name);
+        // console.log(this.users);
+        var tempUser = this.users.map((user) => user.name);
+        var temp = new Users();
+        return temp.removeDuplicate(tempUser);
     }
 
 

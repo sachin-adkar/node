@@ -10,50 +10,168 @@
 
 
 <body>
-    <div class="centered-form" id="centered-form">
-            <div class="centered-form__form" id="centered-form__form">
-                    <div class="create-room">
+    <div class="centered-form" id="signup">
+        <div class="centered-form__form" id="centered-form__form">
+            <div class="create-room">
                 <form id="signup-form">
-            <div class="form-field">
-                <h3>Join a chat</h3>
+                    <div class="form-field">
+                        <h3>Join a chat</h3>
+                    </div>
+                    <div class="form-field">
+                        <label>Enter name</label>
+                        <input type="text" name="name" autofocus id="signupName" />
+                    </div>
+                    <div class="form-field">
+                        <label>Enter Email</label>
+                        <input type="text" name="email" id="email" />
+                    </div>
+                    <div class="form-field">
+                        <label>Password</label>
+                        <input type="password" name="password" id="signupPassword" />
+                    </div>
+
+                    <div class="form-field">
+                        <button href="#chat">SIGNUP</button>
+                    </div>
+                    <div class="form-field">
+                        <a href="#login" onclick = "showLogin()">
+                            <i>Already a user?</i>
+                        </a>
+                    </div>
+                </form>
             </div>
-            <div class="form-field">
-                <label>Enter name</label>
-                <input type="text" name="name" autofocus id="name" />
-            </div>
-            <div class="form-field">
-                <label>Enter Email</label>
-                <input type="text" name="email" id="email" />
-            </div>
-            <div class="form-field">
-                <label>Password</label>
-                <input type="password" name="password" id="password" />
+        </div>
+    </div>
+
+
+
+    <div class="centered-form" id="login">
+        <div class="centered-form__form">
+            <form id="login-form">
+                <div class="form-field">
+                    <h3>Join a chat</h3>
+                </div>
+                <div class="form-field">
+                    <label>Enter name</label>
+                    <input type="text" name="name" autofocus id="loginName" />
+                </div>
+                <div class="form-field">
+                    <label>Password</label>
+                    <input type="password" name="password" id="loginPassword" />
+                </div>
+
+                <div class="form-field">
+                    <button href="#chat">LOGIN</button>
+                </div>
+                <div class="form-field">
+                        <a href="#signup" onclick = "showSignup()">
+                            <i>New user?</i>
+                        </a>
+                    </div>
+
+            </form>
+        </div>
+    </div>
+
+    <div class="centered-form" id="chat">
+
+        <div class="chat__sidebar">
+            <h3>Chitchat</h3>
+            <div id="displayUsers"></div>
+        </div>
+        <div style="flex-direction:row; width:50%;">
+            <div class="centered-form__form" id="createRoom">
+                <div class="create-room">
+
+                    <form id="join-form">
+
+                        <div class="form-field" id="greet-user">
+
+                        </div>
+                        <div class="form-field">
+                            <label>Create chat room</label>
+                            <input type="text" name="room" id="room" />
+                        </div>
+                        <div class="form-field">
+                            <label>Active chat rooms</label>
+
+                            <select id="select" name="activeRoom">
+                                <option value="">Select</option>
+                            </select>
+                        </div>
+
+                        <div class="form-field">
+                            <button type="submit">Join</button>
+                        </div>
+                    </form>
+                </div>
             </div>
 
-            <div class="form-field">
-                <button>Join</button>
+
+            <div class="chat" id="chatRoom">
+                <div class="chat__main">
+                    <ol id="messages" class="chat__messages"></ol>
+
+                    <div class="chat__footer">
+                        <form id="message-form">
+                            <input name="message" class="chat__input" type="text" placeholder="Message" autofocus autocomplete="" />
+                            <button>Send</button>
+                        </form>
+                        <button id="send-location">Send Location</button>
+                    </div>
+                </div>
+
+
+
+                <script id="message-template" type="text/template">
+            <li class="message">
+            <div class="message__title">
+                <h4>{{from}}</h4>
+                <span>{{createdAt}}</span>
             </div>
-            <div class="form-field">
-                <a href="/login.html">
-                    <i>Already a user?</i>
-                </a>
+             <div class="message__body">
+                 <p>{{text}}</p>
+             </div>
+            </li>
+            </script>
+
+                <script id="location-message-template" type="text/template">
+                <li class="message">
+                <div class="message__title">
+                    <h4>{{from}}</h4>
+                    <span>{{createdAt}}</span>
+                </div>
+                 <div class="message__body">
+                     <a href="{{url}}" target="_black">My current location</a>
+                 </div>
+                </li>
+                </script>
             </div>
-        </form>
+        </div>
+
+
+
+        <div class="chat__sidebar">
+            <h3>Active Rooms</h3>
+            <div id="displayRooms"></div>
+        </div>
     </div>
-    </div>
-    </div>
-    <div id="add-next"></div>
+
     <script src="/socket.io/socket.io.js"></script>
     <script>
         socket = io();
     </script>
     <script src="/js/libs/jquery-3.1.0.min.js"></script>
     <script src="//fast.wistia.net/labs/fresh-url/v1.js" async></script>
-    <!-- <script src="js/libs/mustache.js"></script> -->
+    <script src="js/libs/moment.js"></script>
+    <script src="js/libs/mustache.js"></script>
+  
     <script src="js/libs/deparam.js"></script>
     <script src="/js/signup.js"></script>
+    <script src="/js/next.js"></script>
     <script src="/js/chat.js"></script>
     <script src="/js/index.js"></script>
+    
 
 </body>
 

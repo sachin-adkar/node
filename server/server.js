@@ -1,3 +1,4 @@
+
 require('./config/config.js');
 
 const path = require('path');
@@ -29,30 +30,20 @@ app.use(express.static(publicPath));
 app.use(bodyParser.json());
 var urlencodedParser = bodyParser.urlencoded({ extended: false })
 
-app.get('/login', async (req, res) => {
-    try {
 
-        var user = await User.findUser(req.query.name, req.query.password);
-        if (!user) {
-            res.send('Invalid username and password, try again');
-        }
-        res.send('Loggedi n')
-    } catch (e) {
-        res.status(401).send('Invalid username and password, try again');
-    }
-})
 
 io.on('connection', (socket) => {
     console.log('New user connected');
-    var rooms = [];
+
 
     socket.on('signup', (data, callback) => {
         var userData = new User(data);
         userData.save().then((userDoc) => {
-            console.log(userDoc);
+            // console.log(userDoc);
+            // user = _.pick('userDoc', ["name", "_id"]);
             users.addUser(socket.id, userDoc.name);
-            socket.emit("signed-up", userDoc);
-
+            socket.emit("signedUp", userDoc);
+            showOnlineUsers(users);
             callback();
 
         }).catch((err) => {
@@ -61,43 +52,82 @@ io.on('connection', (socket) => {
         });
     });
 
-socket.on('setroom', function(id,room){
-    
-    var user = users.getUser(socket.id);
-    user.room = room; 
-    console.log(user);
-    
-        User.findOneAndUpdate({
-        _id: id,
-      }, { $set:{room: room} }, { new: true }).then((userDoc)=>{
-        //   console.log(userDoc);
-          socket.emit('initiate', userDoc);
-    }).catch((e)=>{
-        console.log(e);
-        
+    socket.on('login', async (data, callback) => {
+        try {
+            var user = await User.findUser(data.name);
+            if (!user) {
+                callback('Error! Invalid username or password')
+            } else {
+                if (data.password === user.password) {
+                    let userInObj = users.addUser(user.id, user.name, '', socket.id);
+                    socket.emit('loginSuccess', user);
+                    showOnlineUsers();
+                    showActiveRooms();
+                    callback();
+                }
+                else {
+                    callback(`Invalid password. Are you ${user.name}?`);
+                }
+            }
+
+        } catch (e) {
+            callback('Invalid username and password, try again');
+        }
     });
-});
+
+    socket.on('setroom', function (id, room) {
+        // console.log(room);
+
+        var user = users.getUser(id);
+        user.room = room;
+
+
+        User.findOneAndUpdate({
+            _id: id,
+        }, { $set: { room: room } }, { new: true }).then((userDoc) => {
+            //   console.log(userDoc);
+            socket.emit('initiate', userDoc);
+        }).catch((e) => {
+            console.log(e);
+        });
+    });
+    
+    var rooms = [];
+
+    var showOnlineUsers = () => {
+       
+        console.log("existing users", users);
+        var usersList = users.getAllUsers();
+        
+        // console.log("updateUserList", usersList);
+
+        io.emit('updateUserLists', usersList);
+    }
+
+
+    //should be modified in the future
+    var showActiveRooms = ()=>{
+        rooms = rooms.concat(users.getRooms());
+        if(rooms){
+            io.emit('displayRooms', rooms);
+            }
+    }
 
 
 
-
-
-
-
-    rooms = rooms.concat(users.getRooms());
-    var usersList = users.getAllUsers();
-    io.emit('displayRooms', rooms);
-    io.emit('displayUsers', usersList);
 
     socket.on('join', (user, callback) => {
-       console.log('listen to join',user);
-       
-        socket.join(user.room);
-        
-        users.removeUser(user.id);
-        users.addUser(user.id, user.name, user.room);
+        // console.log('listen to join', user);
 
-        io.to(user.room).emit('updateUserList', users.getUserList(user.room));
+        socket.join(user.room);
+
+
+
+
+        users.removeUser(user.id);
+        users.addUser(user.id, user.name, user.room, socket.id);
+        showActiveRooms();
+        // io.to(user.room).emit('updateUserList', users.getUserList(user.room));
         socket.emit('newMessage', generateMessage('Admin', 'Welcome to the chat app'));
         socket.broadcast.to(user.room).emit('newMessage', generateMessage('Admin', `${user.name} has joined the chat!`));
 
@@ -139,3 +169,23 @@ socket.on('setroom', function(id,room){
 server.listen(3000, () => {
     console.log('Server is running on port ', port);
 });
+
+
+
+
+
+
+
+
+// app.get('/login', async (req, res) => {
+//     try {
+
+//         var user = await User.findUser(req.query.name, req.query.password);
+//         if (!user) {
+//             res.send('Invalid username and password, try again');
+//         }
+//         res.send('Loggedi n')
+//     } catch (e) {
+//         res.status(401).send('Invalid username and password, try again');
+//     }
+// });

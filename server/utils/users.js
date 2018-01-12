@@ -23,16 +23,20 @@ class Users {
         var user = this.getUser(id);
         user.room = room;
     }
-    removeUser(id) {
-        var user = this.getUser(id);
+    removeUser(socketid) {
+        var user = this.getUserBySocketId(socketid);
 
         if (user) {
-            this.users = this.users.filter((user) => user.id !== id);
+            this.users = this.users.filter((user) => user._socketid !== socketid);
         }
         return user;
     }
     getUser(id) {
         return this.users.filter((user) => user.id === id)[0];
+    }
+
+    getUserBySocketId(id) {
+        return this.users.filter((user) => user._socketid === id)[0];
     }
     getUserList(room) {
         var users = this.users.filter((user) => user.room === room);
@@ -41,10 +45,13 @@ class Users {
         return namesArray;
     }
     getRooms() {
-
         var tempRoom = this.users.map((user) => user.room);
-        var temp = new Users();
-        return temp.removeDuplicate(tempRoom);
+        return tempRoom.filter(function (room, pos, self) {
+            return self.indexOf(room) == pos;
+        })
+
+        // var temp = new Users();
+        // return temp.removeDuplicate(tempRoom);
     }
     getAllUsers() {
         // console.log(this.users);
@@ -53,6 +60,17 @@ class Users {
         return temp.removeDuplicate(tempUser);
     }
 
+    getSocketId(userName) {
+        var tempList = this.users.filter((user) => user.name === userName);
+        return tempList.map((id) => id._socketid)[0];
+    }
+
+    getUserId(socketId) {
+        var tempList = this.users.filter((user) => user._socketid === socketId);
+        // console.log(tempList);
+        
+        return tempList.map((user) => user.id)[0];
+    }
 
 
     removeDuplicate(arr) {
@@ -63,6 +81,23 @@ class Users {
             }
         }
         return unique_array
+    }
+
+    generateRoomToken(senderSocketId, recieverSocketId) {
+        
+        var senderId = this.getUserId(senderSocketId);
+        var recieverId = this.getUserId(recieverSocketId);
+    //    console.log(recieverId);
+       
+        var res = '\0';
+        let length = senderId.length;
+        for (var i = 0; i < length; i++) {
+            let temp = String.fromCharCode((senderId.charCodeAt(i)) + (recieverId.charCodeAt(i)));
+            res = res.concat(temp);
+        }
+        console.log(res);
+        
+        return res;
     }
 }
 

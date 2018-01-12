@@ -76,56 +76,43 @@ io.on('connection', (socket) => {
     });
 
     socket.on('setroom', function (id, room) {
-        // console.log(room);
-
         var user = users.getUser(id);
         user.room = room;
-
-
         User.findOneAndUpdate({
             _id: id,
         }, { $set: { room: room } }, { new: true }).then((userDoc) => {
-            //   console.log(userDoc);
             socket.emit('initiate', userDoc);
         }).catch((e) => {
             console.log(e);
         });
     });
-    
+
     var rooms = [];
 
     var showOnlineUsers = () => {
-       
-        console.log("existing users", users);
         var usersList = users.getAllUsers();
-        
-        // console.log("updateUserList", usersList);
-
         io.emit('updateUserLists', usersList);
     }
 
 
     //should be modified in the future
-    var showActiveRooms = ()=>{
-        rooms = rooms.concat(users.getRooms());
-        if(rooms){
+    var showActiveRooms = () => {
+        rooms = users.getRooms();
+
+        // console.log(rooms);
+
+        if (rooms) {
             io.emit('displayRooms', rooms);
-            }
+        }
     }
 
 
 
 
     socket.on('join', (user, callback) => {
-        // console.log('listen to join', user);
-
-        socket.join(user.room);
-
-
-
-
-        users.removeUser(user.id);
+        users.removeUser(socket.id);
         users.addUser(user.id, user.name, user.room, socket.id);
+        socket.join(user.room);
         showActiveRooms();
         // io.to(user.room).emit('updateUserList', users.getUserList(user.room));
         socket.emit('newMessage', generateMessage('Admin', 'Welcome to the chat app'));
@@ -135,22 +122,28 @@ io.on('connection', (socket) => {
     });
 
     socket.on('createMessage', (message, callback) => {
-        var user = users.getUser(socket.id);
+        var user = users.getUserBySocketId(socket.id);
         if (user && isRealString(message.text)) {
             io.to(user.room).emit('newMessage', generateMessage(user.name, message.text));
         }
-
         callback();
     });
-
 
     socket.on('createLocationMessage', (coords) => {
         var user = users.getUser(socket.id);
         if (user) {
             io.to(user.room).emit('newLocationMessage', generateLocationMessage(user.name, coords.latitude, coords.longitude));
         }
+    });
 
-
+    socket.on('createPrivateChat', (user) => {
+        let socketId = users.getSocketId(user);
+        var roomId = users.generateRoomToken(socket.id, socketId);
+        socket.join(roomId);
+        // console.log(users.getUserBySocketId(socket.id));
+         
+        socket.to(socketId).emit('notifyUser', users.getUserBySocketId(socket.id).name);
+        
     });
 
     socket.on('disconnect', () => {
@@ -164,7 +157,6 @@ io.on('connection', (socket) => {
         console.log('Client disconnected');
     });
 });
-
 
 server.listen(3000, () => {
     console.log('Server is running on port ', port);

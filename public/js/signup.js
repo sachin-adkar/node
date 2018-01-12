@@ -49,7 +49,7 @@ jQuery(`#signup-form`).on('submit', function (e) {
 });
 socket.on('signedUp', function (user) {
     id = user._id;
-    console.log(id);
+    // console.log(id);
     showChatPage();
     passNext(user.name);
 });
@@ -71,7 +71,7 @@ jQuery(`#login-form`).on('submit', function (e) {
 
 socket.on('loginSuccess', function (user) {
     id = user._id;
-    console.log(id);
+    // console.log(id);
 
     showChatPage();
     passNext(user.name);
@@ -79,25 +79,35 @@ socket.on('loginSuccess', function (user) {
 });
 socket.on('updateUserLists', function (users) {
     var ul = jQuery('<ul></ul>');
+    // console.log(formdata.name);
 
     users.forEach(function (user) {
-        ul.append(jQuery('<li></li>').text(user));
+
+
+        if (user !== formdata.name) {
+            ul.append(jQuery('<li></li>').text(user));
+        }
     });
     jQuery('#displayUsers').html(ul);
 });
 
+$('#displayUsers').on('click', 'li', function () {
+    socket.emit('createPrivateChat', $(this).text())
+    
+    socket.on('initiatePrivateChat', function(room){
+        showChatRoom();
+    })
+});
+
 socket.on('displayRooms', function (rooms) {
     var ul = jQuery('<ul></ul>');
-   
-        rooms.forEach(function (room) {
-            if(room !== ''){
-            ul.append(jQuery('<li></li>').text(room));
-            }
-        });
-    
 
+    rooms.forEach(function (room) {
+        if (room !== '') {
+            ul.append(jQuery('<li></li>').text(room));
+        }
+    });
     $('#displayRooms').html(ul);
- 
 });
 
 
@@ -121,7 +131,7 @@ jQuery('#join-form').on('submit', function (e) {
 
 var setRoom = function (room) {
 
-    console.log(id);
+    // console.log(id);
 
     socket.emit('setroom', id, room);
     socket.on('initiate', function (user) {
@@ -137,6 +147,22 @@ var setRoom = function (room) {
     });
 }
 
+socket.on('notifyUser', function (name) {
+    var ul = jQuery('<ul></ul>');
+    if (name !== '') {
+        ul.append(jQuery('<li></li>').text(name));
+    }
+    $('#chats').html(ul);
+});
+
+$('#chats').on('click', 'li', function () {
+    setPrivateRoom();
+});
+
+var setPrivateRoom = function(){
+    showChatRoom();
+}
+
 var setMessage = function (message) {
     var formattedTime = moment(message.createdAt).format('h:mm a')
     var template = jQuery('#message-template').html();
@@ -150,8 +176,9 @@ var setMessage = function (message) {
 
 jQuery(`#message-form`).on('submit', function (e) {
     e.preventDefault();
-
     var messageTextbox = jQuery('[name=message]');
+    // console.log(messageTextbox.val());
+
 
     socket.emit('createMessage', {
         text: messageTextbox.val()

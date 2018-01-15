@@ -1,5 +1,6 @@
 var id;
 var formdata;
+var chatData;
 
 window.onload = function () {
     $('#login').hide();
@@ -7,13 +8,13 @@ window.onload = function () {
 };
 
 var showLogin = function () {
-    $('#login').show();
     $('#signup').hide();
+    $('#login').show();
 };
 
 var showSignup = function () {
-    $('#signup').show();
     $('#login').hide();
+    $('#signup').show();
 };
 
 var showChatPage = function () {
@@ -21,11 +22,21 @@ var showChatPage = function () {
     $('#login').hide();
     $('#chat').show();
     $('#chatRoom').hide();
+    $('#privateChatRoom').hide();
 };
 
 var showChatRoom = function () {
     $('#chatRoom').show();
     $('#createRoom').hide();
+    $('#privateChatRoom').hide();
+}
+
+var showPrivateChatRoom = function () {
+    $('#chatRoom').hide();
+    $('#createRoom').hide();
+    roomData = $('#privateChatRoom').detach();
+      $('#message-template').html("");
+    $('#privateChatRoom').show();
 }
 
 var passNext = function (user) {
@@ -78,6 +89,7 @@ socket.on('loginSuccess', function (user) {
 
 });
 socket.on('updateUserLists', function (users) {
+    socketIO
     var ul = jQuery('<ul></ul>');
     // console.log(formdata.name);
 
@@ -91,13 +103,13 @@ socket.on('updateUserLists', function (users) {
     jQuery('#displayUsers').html(ul);
 });
 
-$('#displayUsers').on('click', 'li', function () {
+var reciever;
+$('#displayUsers, #chats').on('click', 'li', function () {
+    reciever = $(this).text();
     socket.emit('createPrivateChat', $(this).text())
-    
-    socket.on('initiatePrivateChat', function(room){
-        showChatRoom();
-    })
+    showPrivateChatRoom();
 });
+
 
 socket.on('displayRooms', function (rooms) {
     var ul = jQuery('<ul></ul>');
@@ -110,9 +122,6 @@ socket.on('displayRooms', function (rooms) {
     $('#displayRooms').html(ul);
 });
 
-
-
-
 jQuery('#join-form').on('submit', function (e) {
     e.preventDefault();
     var room = jQuery('#room').val();
@@ -124,15 +133,7 @@ jQuery('#join-form').on('submit', function (e) {
     setRoom(room);
 });
 
-
-
-
-
-
 var setRoom = function (room) {
-
-    // console.log(id);
-
     socket.emit('setroom', id, room);
     socket.on('initiate', function (user) {
         showChatRoom();
@@ -145,22 +146,6 @@ var setRoom = function (room) {
         });
 
     });
-}
-
-socket.on('notifyUser', function (name) {
-    var ul = jQuery('<ul></ul>');
-    if (name !== '') {
-        ul.append(jQuery('<li></li>').text(name));
-    }
-    $('#chats').html(ul);
-});
-
-$('#chats').on('click', 'li', function () {
-    setPrivateRoom();
-});
-
-var setPrivateRoom = function(){
-    showChatRoom();
 }
 
 var setMessage = function (message) {
@@ -177,19 +162,45 @@ var setMessage = function (message) {
 jQuery(`#message-form`).on('submit', function (e) {
     e.preventDefault();
     var messageTextbox = jQuery('[name=message]');
-    // console.log(messageTextbox.val());
-
-
     socket.emit('createMessage', {
-        text: messageTextbox.val()
+        text: socketIOmessageTextbox.val()
     }, function () {
         messageTextbox.val('');
     });
 });
-// var removeRoomForm = function(){
-//     $('#centered-form__form').hide();
-// }
 
 
+jQuery(`#private-message-form`).on('submit', function (e) {
+    e.preventDefault();
+    var messageTextbox = jQuery('[name=privateMessage]');
 
+    socket.emit('createPrivateMessage', {
+        text: messageTextbox.val()
+    }, reciever, function () {
+        messageTextbox.val('');
+    });
+});
 
+socket.on('newPrivateMessage', function (message) {
+    setPrivateMessage(message);
+    // scrollToBottom();
+});
+
+socket.on('notifyUser', function (name) {
+    var ul = jQuery('<ul></ul>');
+    if (name !== '') {
+        ul.append(jQuery('<li></li>').text(name));
+    }
+    $('#chats').html(ul);
+});
+
+var setPrivateMessage = function (message) {
+    var formattedTime = moment(message.createdAt).format('h:mm a')
+    var template = jQuery('#private-message-template').html();
+    var html = Mustache.render(template, {
+        text: message.text,
+        from: message.from,
+        createdAt: formattedTime
+    });
+    jQuery('#private-messages').append(html);
+};

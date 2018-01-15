@@ -106,9 +106,6 @@ io.on('connection', (socket) => {
         }
     }
 
-
-
-
     socket.on('join', (user, callback) => {
         users.removeUser(socket.id);
         users.addUser(user.id, user.name, user.room, socket.id);
@@ -140,11 +137,18 @@ io.on('connection', (socket) => {
         let socketId = users.getSocketId(user);
         var roomId = users.generateRoomToken(socket.id, socketId);
         socket.join(roomId);
+        socket.emit('newMessage', generateMessage('Admin', 'Welcome to the chat app'));
         // console.log(users.getUserBySocketId(socket.id));
-         
+
+   
+    socket.on('createPrivateMessage', (message, reciever, callback) => {
+        let socketId = users.getSocketId(reciever);
         socket.to(socketId).emit('notifyUser', users.getUserBySocketId(socket.id).name);
-        
+        io.to(roomId).emit('newPrivateMessage', generateMessage(users.getUserBySocketId(socket.id).name, message.text));
     });
+});
+
+        // socket.to(socketId).emit('notifyUser', users.getUserBySocketId(socket.id).name);
 
     socket.on('disconnect', () => {
 

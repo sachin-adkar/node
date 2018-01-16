@@ -139,11 +139,11 @@ io.on('connection', (socket) => {
         socket.join(roomId);
     });
 
-    socket.on('createPrivateMessage', (message, reciever, callback) => {
+    socket.on('createPrivateMessage', (message, reciever) => {
         let socketId = users.getSocketId(reciever);
         socket.to(socketId).emit('notifyUser', users.getUserBySocketId(socket.id).name);
        io.to(roomId).emit('newPrivateMessage', generateMessage(users.getUserBySocketId(socket.id).name, message.text));
-        callback();
+       
     });
 
 
@@ -160,13 +160,6 @@ io.on('connection', (socket) => {
 server.listen(3000, () => {
     console.log('Server is running on port ', port);
 });
-
-
-
-
-
-
-
 
 // app.get('/login', async (req, res) => {
 //     try {

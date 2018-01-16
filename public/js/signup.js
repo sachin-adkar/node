@@ -121,12 +121,10 @@ jQuery(`#message-form`).on('submit', function (e) {
     
     socket.emit('createPrivateMessage', {
         text: messageTextbox.val()
-    }, reciever, function () {
-        messageTextbox.val('');
-    });
-
+    }, reciever);
+   
+   
 });
-
 socket.on('notifyUser', function (name) {
     var ul= jQuery('<ul></ul>');
 
@@ -144,10 +142,6 @@ socket.on('newPrivateMessage', function (message) {
     setMessage(message);
     // scrollToBottom();
 });
-
-
-
-
 
 jQuery('#join-form').on('submit', function (e) {
     e.preventDefault();
@@ -220,4 +214,17 @@ socket.on('displayRooms', function (rooms) {
         }
     });
     $('#displayRooms').html(ul);
+});
+$('#displayRooms').on('click', 'li', function () {
+
+var room = $(this).text();
+if (!room) {
+    alert('Please create or join a room');
+    return;
+}
+// showChatRoom();
+$('#chatRoom').hide();
+$('#groupChatRoom').show();
+$('#groupChatRoom').load('group-chat.html');
+setRoom(room);
 });

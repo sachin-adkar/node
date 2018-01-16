@@ -113,78 +113,10 @@
 
 
             <div class="chat" id="chatRoom">
-                <div class="chat__main">
-                    <ol id="messages" class="chat__messages"></ol>
-
-                    <div class="chat__footer">
-                        <form id="message-form">
-                            <input name="message" class="chat__input" type="text" placeholder="Message" autofocus autocomplete="" />
-                            <button>Send</button>
-                        </form>
-                        <button id="send-location">Send Location</button>
-                    </div>
-                </div>
-
-                <script id="message-template" type="text/template">
-            <li class="message">
-            <div class="message__title">
-                <h4>{{from}}</h4>
-                <span>{{createdAt}}</span>
-            </div>
-             <div class="message__body">
-                 <p>{{text}}</p>
-             </div>
-            </li>
-            </script>
-
-                <script id="location-message-template" type="text/template">
-                <li class="message">
-                <div class="message__title">
-                    <h4>{{from}}</h4>
-                    <span>{{createdAt}}</span>
-                </div>
-                 <div class="message__body">
-                     <a href="{{url}}" target="_blank">My current location</a>
-                 </div>
-                </li>
-                </script>
-            </div>
-            <div class="chat" id="privateChatRoom">
-                <div class="chat__main">
-                    <ol id="private-messages" class="chat__messages"></ol>
-
-                    <div class="chat__footer">
-                        <form id="private-message-form">
-                            <input name="privateMessage" class="chat__input" type="text" placeholder="Message" autofocus autocomplete="" />
-                            <button>Send</button>
-                        </form>
-                        <button id="send-private-location">Send Location</button>
-                    </div>
-                </div>
-
-                <script id="private-message-template" type="text/template">
-            <li class="message">
-            <div class="message__title">
-                <h4>{{from}}</h4>
-                <span>{{createdAt}}</span>
-            </div>
-             <div class="message__body">
-                 <p>{{text}}</p>
-             </div>
-            </li>
-            </script>
-
-                <script id="private-location-message-template" type="text/template">
-                <li class="message">
-                <div class="message__title">
-                    <h4>{{from}}</h4>
-                    <span>{{createdAt}}</span>
-                </div>
-                 <div class="message__body">
-                     <a href="{{url}}" target="_blank">My current location</a>
-                 </div>
-                </li>
-                </script>
+               
+            </div> 
+            <div class="chat" id="groupChatRoom">
+              
             </div>
         </div>
 
@@ -206,12 +138,7 @@
     <script src="js/libs/mustache.js"></script>
   
     <script src="js/libs/deparam.js"></script>
-    <script src="/js/signup.js"></script>
-    <script src="/js/next.js"></script>
-    <script src="/js/chat.js"></script>
-    <script src="/js/index.js"></script>
-    
-
+    <script src="/js/signup.js"></script> 
 </body>
 
 </html>

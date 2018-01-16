@@ -34,8 +34,6 @@ var showChatRoom = function () {
 var showPrivateChatRoom = function () {
     $('#chatRoom').hide();
     $('#createRoom').hide();
-    roomData = $('#privateChatRoom').detach();
-      $('#message-template').html("");
     $('#privateChatRoom').show();
 }
 
@@ -89,7 +87,7 @@ socket.on('loginSuccess', function (user) {
 
 });
 socket.on('updateUserLists', function (users) {
-    socketIO
+  
     var ul = jQuery('<ul></ul>');
     // console.log(formdata.name);
 
@@ -105,22 +103,51 @@ socket.on('updateUserLists', function (users) {
 
 var reciever;
 $('#displayUsers, #chats').on('click', 'li', function () {
+    $('#chatRoom').show();
+    $('#createRoom').hide();
+    $('#groupChatRoom').hide();
+    $("#chatRoom").load("chat.html"); 
+
     reciever = $(this).text();
     socket.emit('createPrivateChat', $(this).text())
-    showPrivateChatRoom();
+    // showPrivateChatRoom();
 });
 
-
-socket.on('displayRooms', function (rooms) {
-    var ul = jQuery('<ul></ul>');
-
-    rooms.forEach(function (room) {
-        if (room !== '') {
-            ul.append(jQuery('<li></li>').text(room));
-        }
+var chatList = [];
+jQuery(`#message-form`).on('submit', function (e) {
+    e.preventDefault();
+    var messageTextbox = jQuery('[name=message]');
+    console.log('from form', messageTextbox.val());
+    
+    socket.emit('createPrivateMessage', {
+        text: messageTextbox.val()
+    }, reciever, function () {
+        messageTextbox.val('');
     });
-    $('#displayRooms').html(ul);
+
 });
+
+socket.on('notifyUser', function (name) {
+    var ul= jQuery('<ul></ul>');
+
+    if(chatList.indexOf(name) === -1 ){    
+        chatList.push(name);
+    }
+        chatList.forEach(function(user){
+        ul.append(jQuery('<li></li>').text(user));
+        });
+    $('#chats').html(ul);
+});
+
+socket.on('newPrivateMessage', function (message) {
+    console.log('Listening',message);
+    setMessage(message);
+    // scrollToBottom();
+});
+
+
+
+
 
 jQuery('#join-form').on('submit', function (e) {
     e.preventDefault();
@@ -130,6 +157,9 @@ jQuery('#join-form').on('submit', function (e) {
         return;
     }
     // showChatRoom();
+    $('#chatRoom').hide();
+    $('#groupChatRoom').show();
+    $('#groupChatRoom').load('group-chat.html');
     setRoom(room);
 });
 
@@ -141,10 +171,9 @@ var setRoom = function (room) {
             if (e) console.log('error');
         });
         socket.on('newMessage', function (message) {
-            setMessage(message);
+            setGroupMessage(message);
             // scrollToBottom();
         });
-
     });
 }
 
@@ -159,48 +188,36 @@ var setMessage = function (message) {
     jQuery('#messages').append(html);
 };
 
-jQuery(`#message-form`).on('submit', function (e) {
+var setGroupMessage = function (message) {
+    var formattedTime = moment(message.createdAt).format('h:mm a')
+    var template = jQuery('#group-message-template').html();
+    var html = Mustache.render(template, {
+        text: message.text,
+        from: message.from,
+        createdAt: formattedTime
+    });
+    jQuery('#group-messages').append(html);
+};
+
+jQuery(`#group-message-form`).on('submit', function (e) {
     e.preventDefault();
     var messageTextbox = jQuery('[name=message]');
     socket.emit('createMessage', {
-        text: socketIOmessageTextbox.val()
+        text: messageTextbox.val()
     }, function () {
         messageTextbox.val('');
     });
 });
 
 
-jQuery(`#private-message-form`).on('submit', function (e) {
-    e.preventDefault();
-    var messageTextbox = jQuery('[name=privateMessage]');
 
-    socket.emit('createPrivateMessage', {
-        text: messageTextbox.val()
-    }, reciever, function () {
-        messageTextbox.val('');
-    });
-});
-
-socket.on('newPrivateMessage', function (message) {
-    setPrivateMessage(message);
-    // scrollToBottom();
-});
-
-socket.on('notifyUser', function (name) {
+socket.on('displayRooms', function (rooms) {
     var ul = jQuery('<ul></ul>');
-    if (name !== '') {
-        ul.append(jQuery('<li></li>').text(name));
-    }
-    $('#chats').html(ul);
-});
 
-var setPrivateMessage = function (message) {
-    var formattedTime = moment(message.createdAt).format('h:mm a')
-    var template = jQuery('#private-message-template').html();
-    var html = Mustache.render(template, {
-        text: message.text,
-        from: message.from,
-        createdAt: formattedTime
+    rooms.forEach(function (room) {
+        if (room !== '') {
+            ul.append(jQuery('<li></li>').text(room));
+        }
     });
-    jQuery('#private-messages').append(html);
-};
+    $('#displayRooms').html(ul);
+});

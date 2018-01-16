@@ -132,32 +132,27 @@ io.on('connection', (socket) => {
             io.to(user.room).emit('newLocationMessage', generateLocationMessage(user.name, coords.latitude, coords.longitude));
         }
     });
-
+    var roomId;
     socket.on('createPrivateChat', (user) => {
         let socketId = users.getSocketId(user);
-        var roomId = users.generateRoomToken(socket.id, socketId);
+        roomId = users.generateRoomToken(socket.id, socketId);
         socket.join(roomId);
-        socket.emit('newMessage', generateMessage('Admin', 'Welcome to the chat app'));
-        // console.log(users.getUserBySocketId(socket.id));
+    });
 
-   
     socket.on('createPrivateMessage', (message, reciever, callback) => {
         let socketId = users.getSocketId(reciever);
         socket.to(socketId).emit('notifyUser', users.getUserBySocketId(socket.id).name);
-        io.to(roomId).emit('newPrivateMessage', generateMessage(users.getUserBySocketId(socket.id).name, message.text));
+       io.to(roomId).emit('newPrivateMessage', generateMessage(users.getUserBySocketId(socket.id).name, message.text));
+        callback();
     });
-});
 
-        // socket.to(socketId).emit('notifyUser', users.getUserBySocketId(socket.id).name);
 
     socket.on('disconnect', () => {
-
         var user = users.removeUser(socket.id);
         if (user) {
             io.to(user.room).emit('updateUserList', users.getUserList(user.room));
             io.to(user.room).emit('newMessage', generateMessage('Admin', `${user.name} has left the chat !`));
         }
-
         console.log('Client disconnected');
     });
 });
